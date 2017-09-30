@@ -144,7 +144,7 @@ void Parser::Next() {
 					if (*start == '/') {  // documentation comment
 						if (!seen_newline)
 							Error("a documentation comment should be on a line on its own");
-						// todo: do we want to support multiline comments instead?
+						// TODO: To support multiline comments.
 						doc_comment_ += std::string(start + 1, cursor_);
 					}
 					break;
