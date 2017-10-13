@@ -45,7 +45,7 @@ class Info {
 		auto field_offset = GetOptionalFieldOffset(field);
 		auto p = &data_[field_offset];
 		return field_offset
-			? reinterpret_cast<P>(p + ReadScalar<uoffset_t>(p))
+			? reinterpret_cast<P>(p + ReadScalar<uofs_t>(p))
 			: nullptr;
 	}
 

@@ -50,7 +50,7 @@ template<typename T>
 const T *GetRoot(const void *buf) {
 	EndianCheck();
 	return reinterpret_cast<const T *>(reinterpret_cast<const uint8_t *>(buf) +
-		EndianScalar(*reinterpret_cast<const uoffset_t *>(buf)));
+		EndianScalar(*reinterpret_cast<const uofs_t *>(buf)));
 }
 
 
