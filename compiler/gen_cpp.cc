@@ -110,8 +110,8 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 	if (struct_def.generated) return;
 	std::string &code = *code_ptr;
 	GenComment(struct_def.doc_comment, code_ptr);
-	code += "struct " + struct_def.name + " : private megrez::Info";
-	code += " {\n";
+	code += "class " + struct_def.name + " : private megrez::Info";
+	code += " {\n public:\n";
 	for (auto it = struct_def.fields.vec.begin();
 			 it != struct_def.fields.vec.end();
 			 ++it) {

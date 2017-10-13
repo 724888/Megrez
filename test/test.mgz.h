@@ -43,7 +43,8 @@ MANUALLY_ALIGNED_STRUCT(4) address {
 };
 STRUCT_END(address, 12);
 
-struct Person : private megrez::Info {
+class Person : private megrez::Info {
+ public:
 	const address *Add() const { return GetStruct<const address *>(4); }
 	int16_t age() const { return GetField<int16_t>(6, 92); }
 	const megrez::String *name() const { return GetPointer<const megrez::String *>(8); }

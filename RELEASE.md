@@ -1,5 +1,15 @@
 # Release Doc
 
+## v0.0.4
+> **Time: 2017/10/13**
+
+> **Changes**
+1. Make the `info` in cpp files be `class`, and all members in it are public.
+
+> **Next Goal**
+1. Make Megrez supports mutiline comments.
+2. Make MegrezC supports more commands.
+
 ## v0.0.3
 > **Time: 2017/10/13**
 
