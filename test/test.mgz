@@ -31,12 +31,10 @@ struct address {
 }
 
 info Person {
-	Add : address;
+	Address : address;
 	age : short = 92; // Too young, too simple, sometimes Naive! 
 	name : string;
-	friendly : bool = false(deprecated);
-	expend : [float];
-	LifeContinue : [ubyte]; // +1s
+	LifeContinue : [ulong]; // +1s
 	GlassColor: Color = Black;
 }
 

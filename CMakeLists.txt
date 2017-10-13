@@ -20,12 +20,13 @@ set(CMAKE_CXX_STANDARD 11)
 set(MegrezCompilerSrc
 	megrez/basic.h
 	megrez/builder.h
-	megrez/idl.h
 	megrez/info.h
 	megrez/string.h
 	megrez/struct.h
 	megrez/vector.h
 	megrez/util.h
+
+	compiler/idl.h
 	compiler/parser.cc
 	compiler/gen_cpp.cc
 	compiler/MegrezC.cc

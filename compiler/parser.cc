@@ -16,12 +16,12 @@ limitations under the License.
 
 #include "megrez/basic.h"
 #include "megrez/builder.h"
-#include "megrez/idl.h"
 #include "megrez/info.h"
 #include "megrez/string.h"
 #include "megrez/struct.h"
 #include "megrez/vector.h"
 #include "megrez/util.h"
+#include "compiler/idl.h"
 
 namespace megrez {
 

@@ -16,12 +16,12 @@ limitations under the License.
 
 #include "megrez/basic.h"
 #include "megrez/builder.h"
-#include "megrez/idl.h"
 #include "megrez/info.h"
 #include "megrez/string.h"
 #include "megrez/struct.h"
 #include "megrez/vector.h"
 #include "megrez/util.h"
+#include "compiler/idl.h"
 
 namespace megrez {
 namespace cpp {
@@ -164,16 +164,16 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 	code += NumToString(struct_def.fields.vec.size()) + ")); }\n};\n\n";
 	code += "inline megrez::Offset<" + struct_def.name + "> Create";
 	code += struct_def.name;
-	code += "(megrez::MegrezBuilder &_mb";
+	code += "(\n\t  megrez::MegrezBuilder &_mb";
 	for (auto it = struct_def.fields.vec.begin();
 			 it != struct_def.fields.vec.end();
 			 ++it) {
 		auto &field = **it;
 		if (!field.deprecated) {
-			code += ", " + GenTypeWire(field.value.type, " ") + field.name;
+			code += ",\n\t  " + GenTypeWire(field.value.type, " ") + field.name;
 		}
 	}
-	code += ") {\n\t" + struct_def.name + "Builder builder_(_mb);\n";
+	code += ") {\n\n\t" + struct_def.name + "Builder builder_(_mb);\n";
 	for (size_t size = struct_def.sortbysize ? sizeof(max_scalar_t) : 1;
 			 size;
 			 size /= 2) {
