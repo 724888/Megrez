@@ -1,4 +1,4 @@
-Megrez Version 0.0.2
+Megrez Version
 ====================
 ## Welcome to Megrez!
 
