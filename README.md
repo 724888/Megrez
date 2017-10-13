@@ -1,3 +1,7 @@
+<div>
+	<img src="./doc/logo.png">
+</div>
+
 Megrez
 ====================
 
