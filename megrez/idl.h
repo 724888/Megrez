@@ -19,45 +19,53 @@ limitations under the License.
 
 #include <map>
 #include <memory>
-#include "megrez.h"
+#include <vector>
+#include <string.h>
+#include <assert.h>
+
+#include "megrez/basic.h"
+#include "megrez/builder.h"
+#include "megrez/info.h"
+#include "megrez/string.h"
+#include "megrez/struct.h"
+#include "megrez/vector.h"
+#include "megrez/util.h"
 
 namespace megrez {
 
 #define MEGREZ_GEN_TYPES_SCALAR(TD) \
-	TD(NONE,   "",       uint8_t,  byte  ) \
-	TD(UTYPE,  "",       uint8_t,  byte  ) \
-	TD(BOOL,   "bool",   uint8_t,  byte  ) \
-	TD(CHAR,   "byte",   int8_t,   byte  ) \
-	TD(UCHAR,  "ubyte",  uint8_t,  byte  ) \
-	TD(SHORT,  "short",  int16_t,  short ) \
-	TD(USHORT, "ushort", uint16_t, short ) \
-	TD(INT,    "int",    int32_t,  int   ) \
-	TD(UINT,   "uint",   uint32_t, int   ) \
-	TD(LONG,   "long",   int64_t,  long  ) \
-	TD(ULONG,  "ulong",  uint64_t, long  ) \
-	TD(FLOAT,  "float",  float,    float ) \
-	TD(DOUBLE, "double", double,   double)
+	TD(NONE,   "",       uint8_t)   \
+	TD(UTYPE,  "",       uint8_t)   \
+	TD(BOOL,   "bool",   uint8_t)   \
+	TD(CHAR,   "byte",   int8_t)    \
+	TD(UCHAR,  "ubyte",  uint8_t)   \
+	TD(SHORT,  "short",  int16_t)   \
+	TD(USHORT, "ushort", uint16_t)  \
+	TD(INT,    "int",    int32_t)   \
+	TD(UINT,   "uint",   uint32_t)  \
+	TD(LONG,   "long",   int64_t)   \
+	TD(ULONG,  "ulong",  uint64_t)  \
+	TD(FLOAT,  "float",  float)     \
+	TD(DOUBLE, "double", double)
 #define MEGREZ_GEN_TYPES_POINTER(TD) \
-	TD(STRING, "string", Offset<void>, int) \
-	TD(VECTOR, "",       Offset<void>, int) \
-	TD(STRUCT, "",       Offset<void>, int) \
-	TD(UNION,  "",       Offset<void>, int)
-
-
+	TD(STRING, "string", Offset<void>/*, int*/) \
+	TD(VECTOR, "",       Offset<void>/*, int*/) \
+	TD(STRUCT, "",       Offset<void>/*, int*/) \
+	TD(UNION,  "",       Offset<void>/*, int*/)
 #define MEGREZ_GEN_TYPES(TD) \
 		MEGREZ_GEN_TYPES_SCALAR(TD) \
 		MEGREZ_GEN_TYPES_POINTER(TD)
 enum BaseType {
-	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) BASE_TYPE_ ## ENUM,
+	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) BASE_TYPE_ ## ENUM,
 		MEGREZ_GEN_TYPES(MEGREZ_TD)
 	#undef MEGREZ_TD
 };
-
-#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) \
-		static_assert(sizeof(CTYPE) <= sizeof(largest_scalar_t), \
-									"define largest_scalar_t as " #CTYPE);
+#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) \
+		static_assert(sizeof(CTYPE) <= sizeof(max_scalar_t), \
+									"define max_scalar_t as " #CTYPE);
 	MEGREZ_GEN_TYPES(MEGREZ_TD)
 #undef MEGREZ_TD
+
 inline bool IsScalar (BaseType t) { return t >= BASE_TYPE_UTYPE &&	t <= BASE_TYPE_DOUBLE; }
 inline bool IsInteger(BaseType t) { return t >= BASE_TYPE_UTYPE &&	t <= BASE_TYPE_ULONG; }
 inline bool IsFloat  (BaseType t) { return t == BASE_TYPE_FLOAT ||	t == BASE_TYPE_DOUBLE; }
@@ -77,7 +85,6 @@ struct Type {
 		  enum_def(nullptr) {}
 
 	Type VectorType() const { return Type(element, struct_def); }
-
 	BaseType base_type;
 	BaseType element;       // only set if t == BASE_TYPE_VECTOR
 	StructDef *struct_def;  // only set if t or element == BASE_TYPE_STRUCT
@@ -94,7 +101,11 @@ struct Value {
 
 template<typename T> 
 class SymbolInfo {
-public:
+ private:
+	std::map<std::string, T *> dict;
+ public:
+	std::vector<T *> vec;
+ public:
 	~SymbolInfo() { for (auto it = vec.begin(); it != vec.end(); ++it) { delete *it; } }
 	bool Add(const std::string &name, T *e) {
 		vec.emplace_back(e);
@@ -108,15 +119,10 @@ public:
 		auto it = dict.find(name);
 		return it == dict.end() ? nullptr : it->second;
 	}
-private:
-	std::map<std::string, T *> dict;
-public:
-	std::vector<T *> vec;
 };
 
 struct Definition {
 	Definition() : generated(false) {}
-
 	std::string name;
 	std::string doc_comment;
 	SymbolInfo<Value> attributes;
@@ -125,7 +131,6 @@ struct Definition {
 
 struct FieldDef : public Definition {
 	FieldDef() : deprecated(false), padding(0) {}
-
 	Value value;
 	bool deprecated;
 	size_t padding;  // bytes to always pad after this field
@@ -133,11 +138,11 @@ struct FieldDef : public Definition {
 
 struct StructDef : public Definition {
 	StructDef()
-		: fixed(false),
-		  predecl(true),
-		  sortbysize(true),
-		  minalign(1),
-		  bytesize(0) {}
+	: fixed(false),
+	  predecl(true),
+	  sortbysize(true),
+	  minalign(1),
+	  bytesize(0) {}
 
 	void PadLastField(size_t minalign) {
 		auto padding = PaddingBytes(bytesize, minalign);
@@ -168,7 +173,6 @@ inline size_t InlineAlignment(const Type &type) {
 struct EnumVal {
 	EnumVal(const std::string &_name, int _val) 
 	: name(_name), value(_val), struct_def(nullptr) {}
-
 	std::string name;
 	std::string doc_comment;
 	int value;
@@ -177,7 +181,6 @@ struct EnumVal {
 
 struct EnumDef : public Definition {
 	EnumDef() : is_union(false) {}
-
 	StructDef *ReverseLookup(int enum_idx) {
 		assert(is_union);
 		for (auto it = vals.vec.begin() + 1; it != vals.vec.end(); ++it) {
@@ -185,37 +188,33 @@ struct EnumDef : public Definition {
 		}
 		return nullptr;
 	}
-
 	SymbolInfo<EnumVal> vals;
 	bool is_union;
 	Type underlying_type;
 };
 
 class Parser {
-public:
+ public:
 	Parser() :
 		root_struct_def(nullptr),
 		source_(nullptr),
 		cursor_(nullptr),
 		line_(1) {}
-
 	bool Parse(const char *_source);
 	bool SetRootType(const char *name);
 
-private:
+ private:
 	void Next();
 	bool IsNext(int t);
 	void Expect(int t);
 	void ParseType(Type &type);
-	FieldDef &AddField(StructDef &struct_def,
-					   const std::string &name,
-					   const Type &type);
+	FieldDef &AddField(StructDef &struct_def, const std::string &name, const Type &type);
 	void ParseField(StructDef &struct_def);
 	void ParseAnyValue(Value &val, FieldDef *field);
-	uoffset_t ParseInfo(const StructDef &struct_def);
+	uofs_t ParseInfo(const StructDef &struct_def);
 	void SerializeStruct(const StructDef &struct_def, const Value &val);
 	void AddVector(bool sortbysize, int count);
-	uoffset_t ParseVector(const Type &type);
+	uofs_t ParseVector(const Type &type);
 	void ParseMetaData(Definition &def);
 	bool TryTypedValue(int dtoken, bool check, Value &e, BaseType req);
 	void ParseSingleValue(Value &e);
@@ -223,34 +222,27 @@ private:
 	void ParseEnum(bool is_union);
 	void ParseDecl();
 
-public:
+ public:
 	SymbolInfo<StructDef> structs_;
 	SymbolInfo<EnumDef> enums_;
 	std::vector<std::string> name_space_;  // As set in the schema.
 	std::string error_;         // User readable error_ if Parse() == false
-
 	MegrezBuilder builder_;  // any data contained in the file
 	StructDef *root_struct_def;
 
-private:
+ private:
 	const char *source_, *cursor_;
 	int line_;  // the current line being parsed
 	int token_;
 	std::string attribute_, doc_comment_;
-
 	std::vector<std::pair<Value, FieldDef *>> field_stack_;
 	std::vector<uint8_t> struct_stack_;
 };
 
-extern void GenerateText(const Parser &parser,
-						 const void *Megrez,
-						 int indent_step,
-						 std::string *text);
+extern void GenerateText(const Parser &parser, const void *Megrez, int indent_step, std::string *text);
 
 extern std::string GenerateCPP(const Parser &parser);
-extern bool GenerateCPP(const Parser &parser,
-						const std::string &path,
-						const std::string &file_name);
+extern bool GenerateCPP(const Parser &parser, const std::string &path, const std::string &file_name);
 
 }  // namespace megrez
 

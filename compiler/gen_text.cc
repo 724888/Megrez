@@ -14,9 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#include "megrez/megrez.h"
+#include "megrez/basic.h"
+#include "megrez/builder.h"
 #include "megrez/idl.h"
-#include "megrez/utils.h"
+#include "megrez/info.h"
+#include "megrez/string.h"
+#include "megrez/struct.h"
+#include "megrez/vector.h"
+#include "megrez/util.h"
 
 namespace megrez {
 
@@ -30,12 +35,10 @@ void Print(T val, Type type, int indent, int indent_step,
 }
 
 template<typename T> 
-void PrintVector(const Vector<T> &v, Type type,
-				 int indent, int indent_step,
-				 std::string *_text) {
+void PrintVector(const Vector<T> &v, Type type, int indent, int indent_step, std::string *_text) {
 	std::string &text = *_text;
 	text += "[\n";
-	for (uoffset_t i = 0; i < v.Length(); i++) {
+	for (uofs_t i = 0; i < v.Length(); i++) {
 		if (i) text += ",\n";
 		text.append(indent + indent_step, ' ');
 		if (IsStruct(type))
@@ -52,7 +55,7 @@ void PrintVector(const Vector<T> &v, Type type,
 static void EscapeString(const String &s, std::string *_text) {
 	std::string &text = *_text;
 	text += "\"";
-	for (uoffset_t i = 0; i < s.Length(); i++) {
+	for (uofs_t i = 0; i < s.Length(); i++) {
 		char c = s.Get(i);
 		switch (c) {
 			case '\n': text += "\\n"; break;
@@ -150,8 +153,8 @@ static void GenStruct(const StructDef &struct_def, const Info *info,
 	int fieldout = 0;
 	StructDef *union_sd = nullptr;
 	for (auto it = struct_def.fields.vec.begin();
-			 it != struct_def.fields.vec.end();
-			 ++it) {
+		 it != struct_def.fields.vec.end();
+		 ++it) {
 		FieldDef &fd = **it;
 		if (struct_def.fixed || info->CheckField(fd.value.offset)) {
 			// The field is present.
@@ -186,16 +189,11 @@ static void GenStruct(const StructDef &struct_def, const Info *info,
 	text += "}";
 }
 
-void GenerateText(const Parser &parser, const void *megrez,
-				  int indent_step, std::string *_text) {
+void GenerateText(const Parser &parser, const void *megrez, int indent_step, std::string *_text) {
 	std::string &text = *_text;
 	assert(parser.root_struct_def);
 	text.reserve(1024); 
-	GenStruct(*parser.root_struct_def,
-			  GetRoot<Info>(megrez),
-			  0,
-			  indent_step,
-			  _text);
+	GenStruct(*parser.root_struct_def, GetRoot<Info>(megrez), 0, indent_step, _text);
 	text += "\n";
 }
 

@@ -14,23 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#include <algorithm>
-
-#include "megrez/megrez.h"
+#include "megrez/basic.h"
+#include "megrez/builder.h"
 #include "megrez/idl.h"
-#include "megrez/utils.h"
+#include "megrez/info.h"
+#include "megrez/string.h"
+#include "megrez/struct.h"
+#include "megrez/vector.h"
+#include "megrez/util.h"
 
 namespace megrez {
 
 const char *const kTypeNames[] = {
-	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) IDLTYPE,
+	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) IDLTYPE,
 		MEGREZ_GEN_TYPES(MEGREZ_TD)
 	#undef MEGREZ_TD
 	nullptr
 };
 
 const char kTypeSizes[] = {
-	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) sizeof(CTYPE),
+	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) sizeof(CTYPE),
 		MEGREZ_GEN_TYPES(MEGREZ_TD)
 	#undef MEGREZ_TD
 };
@@ -43,7 +46,7 @@ static void CheckBitsFit(int64_t val, size_t bits) {
 	if (bits < 64 &&
 		(val & ~mask) != 0 &&  // Positive or unsigned.
 		(val |  mask) != -1)   // Negative.
-		Error("constant does not fit in a " + NumToString(bits) + "-bit field");
+		Error("Constant does not fit in a " + NumToString(bits) + "-bit field");
 }
 
 // atot: templated version of atoi/atof: convert a string to an instance of T.
@@ -78,7 +81,7 @@ enum {
 	#define MEGREZ_TOKEN(NAME, VALUE, STRING) kToken ## NAME,
 		MEGREZ_GEN_TOKENS(MEGREZ_TOKEN)
 	#undef MEGREZ_TOKEN
-	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) kToken ## ENUM,
+	#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) kToken ## ENUM,
 		MEGREZ_GEN_TYPES(MEGREZ_TD)
 	#undef MEGREZ_TD
 };
@@ -88,7 +91,7 @@ static std::string TokenToString(int t) {
 		#define MEGREZ_TOKEN(NAME, VALUE, STRING) STRING,
 			MEGREZ_GEN_TOKENS(MEGREZ_TOKEN)
 		#undef MEGREZ_TOKEN
-		#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) IDLTYPE,
+		#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) IDLTYPE,
 			MEGREZ_GEN_TYPES(MEGREZ_TD)
 		#undef MEGREZ_TD
 	};
@@ -113,13 +116,13 @@ void Parser::Next() {
 			case ',': case ':': case ';': case '=': return;
 			case '.':
 				if(!isdigit(*cursor_)) return;
-				Error("floating point constant can\'t start with \".\"");
+				Error("Floating point constant can\'t start with \".\"");
 				break;
 			case '\"':
 				attribute_ = "";
 				while (*cursor_ != '\"') {
 					if (*cursor_ < ' ' && *cursor_ >= 0)
-						Error("illegal character in string constant");
+						Error("Illegal character in string constant");
 					if (*cursor_ == '\\') {
 						cursor_++;
 						switch (*cursor_) {
@@ -128,7 +131,7 @@ void Parser::Next() {
 							case 'r':  attribute_ += '\r'; cursor_++; break;
 							case '\"': attribute_ += '\"'; cursor_++; break;
 							case '\\': attribute_ += '\\'; cursor_++; break;
-							default: Error("unknown escape code in string constant"); break;
+							default: Error("Unknown escape code in string constant"); break;
 						}
 					} else {
 						attribute_ += *cursor_++;
@@ -143,7 +146,7 @@ void Parser::Next() {
 					while (*cursor_ && *cursor_ != '\n') cursor_++;
 					if (*start == '/') {  // documentation comment
 						if (!seen_newline)
-							Error("a documentation comment should be on a line on its own");
+							Error("A documentation comment should be on a line on its own");
 						// TODO: To support multiline comments.
 						doc_comment_ += std::string(start + 1, cursor_);
 					}
@@ -160,7 +163,7 @@ void Parser::Next() {
 					attribute_.clear();
 					attribute_.append(start, cursor_);
 					// First, see if it is a type keyword from the info of types:
-					#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) \
+					#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) \
 						if (attribute_ == IDLTYPE) { \
 							token_ = kToken ## ENUM; \
 							return; \
@@ -201,7 +204,7 @@ void Parser::Next() {
 				std::string ch;
 				ch = c;
 				if (c < ' ' || c > '~') ch = "code: " + NumToString(c);
-				Error("illegal character: " + ch);
+				Error("Illegal character: " + ch);
 				break;
 		}
 	}
@@ -214,9 +217,8 @@ bool Parser::IsNext(int t) {
 }
 
 void Parser::Expect(int t) {
-	if (t != token_) {
-		Error("expecting: " + TokenToString(t) + " instead got: " + TokenToString(token_));
-	}
+	if (t != token_) 
+		Error("Expecting: " + TokenToString(t) + " instead got: " + TokenToString(token_));
 	Next();
 }
 
@@ -241,30 +243,28 @@ void Parser::ParseType(Type &type) {
 			if (subtype.base_type == BASE_TYPE_VECTOR) {
 				// We could support this, but it will complicate things, and it's
 				// easier to work around with a struct around the inner vector.
-				Error("nested vector types not supported (wrap in info first).");
+				Error("Nested vector types not supported (wrap in info first).");
 			}
 			if (subtype.base_type == BASE_TYPE_UNION) {
 				// We could support this if we stored a struct of 2 elements per
 				// union element.
-				Error("vector of union types not supported (wrap in info first).");
+				Error("Vector of union types not supported (wrap in info first).");
 			}
 			type = Type(BASE_TYPE_VECTOR, subtype.struct_def);
 			type.element = subtype.base_type;
 			Expect(']');
 			return;
 		} else {
-			Error("illegal type syntax");
+			Error("Illegal type syntax");
 		}
 	}
 	Next();
 }
 
-FieldDef &Parser::AddField(StructDef &struct_def,
-													 const std::string &name,
-													 const Type &type) {
+FieldDef &Parser::AddField(StructDef &struct_def, const std::string &name, const Type &type) {
 	auto &field = *new FieldDef();
 	field.value.offset =
-		FieldIndexToOffset(static_cast<voffset_t>(struct_def.fields.vec.size()));
+		FieldIndexToOffset(static_cast<vofs_t>(struct_def.fields.vec.size()));
 	field.name = name;
 	field.value.type = type;
 	if (struct_def.fixed) {
@@ -272,11 +272,11 @@ FieldDef &Parser::AddField(StructDef &struct_def,
 		auto alignment = InlineAlignment(type);
 		struct_def.minalign = std::max(struct_def.minalign, alignment);
 		struct_def.PadLastField(alignment);
-		field.value.offset = static_cast<uoffset_t>(struct_def.bytesize);
+		field.value.offset = static_cast<uofs_t>(struct_def.bytesize);
 		struct_def.bytesize += size;
 	}
 	if (struct_def.fields.Add(name, &field))
-		Error("field already exists: " + name);
+		Error("Field already exists: " + name);
 	return field;
 }
 
@@ -309,7 +309,7 @@ void Parser::ParseField(StructDef &struct_def) {
 	ParseMetaData(field);
 	field.deprecated = field.attributes.Lookup("deprecated") != nullptr;
 	if (field.deprecated && struct_def.fixed)
-		Error("can't deprecate fields in a struct");
+		Error("Cannot deprecate fields in a struct");
 	Expect(';');
 }
 
@@ -319,11 +319,11 @@ void Parser::ParseAnyValue(Value &val, FieldDef *field) {
 			assert(field);
 			if (!field_stack_.size() ||
 				 field_stack_.back().second->value.type.base_type != BASE_TYPE_UTYPE)
-				Error("missing type field before this union value: " + field->name);
+				Error("Missing type field before this union value: " + field->name);
 			auto enum_idx = atot<unsigned char>(
 																		field_stack_.back().first.constant.c_str());
 			auto struct_def = val.type.enum_def->ReverseLookup(enum_idx);
-			if (!struct_def) Error("illegal type id for: " + field->name);
+			if (!struct_def) Error("Illegal type id for: " + field->name);
 			val.constant = NumToString(ParseInfo(*struct_def));
 			break;
 		}
@@ -348,7 +348,7 @@ void Parser::ParseAnyValue(Value &val, FieldDef *field) {
 }
 
 void Parser::SerializeStruct(const StructDef &struct_def, const Value &val) {
-	auto off = atot<uoffset_t>(val.constant.c_str());
+	auto off = atot<uofs_t>(val.constant.c_str());
 	assert(struct_stack_.size() - off == struct_def.bytesize);
 	builder_.Align(struct_def.minalign);
 	builder_.PushBytes(&struct_stack_[off], struct_def.bytesize);
@@ -356,17 +356,17 @@ void Parser::SerializeStruct(const StructDef &struct_def, const Value &val) {
 	builder_.AddStructOffset(val.offset, builder_.GetSize());
 }
 
-uoffset_t Parser::ParseInfo(const StructDef &struct_def) {
+uofs_t Parser::ParseInfo(const StructDef &struct_def) {
 	Expect('{');
 	size_t fieldn = 0;
 	for (;;) {
 		std::string name = attribute_;
 		if (!IsNext(kTokenStringConstant)) Expect(kTokenIdentifier);
 		auto field = struct_def.fields.Lookup(name);
-		if (!field) Error("unknown field: " + name);
+		if (!field) Error("Unknown field: " + name);
 		if (struct_def.fixed && (fieldn >= struct_def.fields.vec.size()
 			|| struct_def.fields.vec[fieldn] != field)) {
-			 Error("struct field appearing out of order: " + name);
+			 Error("Struct field appearing out of order: " + name);
 		}
 		Expect(':');
 		Value val = field->value;
@@ -377,12 +377,12 @@ uoffset_t Parser::ParseInfo(const StructDef &struct_def) {
 		Expect(',');
 	}
 	if (struct_def.fixed && fieldn != struct_def.fields.vec.size())
-		Error("incomplete struct initialization: " + struct_def.name);
+		Error("Incomplete struct initialization: " + struct_def.name);
 	auto start = struct_def.fixed
 				? builder_.StartStruct(struct_def.minalign)
 				: builder_.StartInfo();
 
-	for (size_t size = struct_def.sortbysize ? sizeof(largest_scalar_t) : 1;
+	for (size_t size = struct_def.sortbysize ? sizeof(max_scalar_t) : 1;
 			 size;
 			 size /= 2) {
 		// Go through elements in reverse, since we're building the data backwards.
@@ -392,7 +392,7 @@ uoffset_t Parser::ParseInfo(const StructDef &struct_def) {
 			auto field = it->second;
 			if (!struct_def.sortbysize || size == SizeOf(value.type.base_type)) {
 				switch (value.type.base_type) {
-					#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) \
+					#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) \
 						case BASE_TYPE_ ## ENUM: \
 							builder_.Pad(field->padding); \
 							builder_.AddElement(value.offset, \
@@ -401,7 +401,7 @@ uoffset_t Parser::ParseInfo(const StructDef &struct_def) {
 							break;
 						MEGREZ_GEN_TYPES_SCALAR(MEGREZ_TD);
 					#undef MEGREZ_TD
-					#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) \
+					#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) \
 						case BASE_TYPE_ ## ENUM: \
 							builder_.Pad(field->padding); \
 							if (IsStruct(field->value.type)) { \
@@ -429,13 +429,13 @@ uoffset_t Parser::ParseInfo(const StructDef &struct_def) {
 							 builder_.GetBufferPointer(),
 							 builder_.GetBufferPointer() + struct_def.bytesize);
 		builder_.PopBytes(struct_def.bytesize);
-		return static_cast<uoffset_t>(off);
+		return static_cast<uofs_t>(off);
 	} else { 
-		return builder_.EndInfo( start, static_cast<voffset_t>(struct_def.fields.vec.size()));
+		return builder_.EndInfo( start, static_cast<vofs_t>(struct_def.fields.vec.size()));
 	}
 }
 
-uoffset_t Parser::ParseVector(const Type &type) {
+uofs_t Parser::ParseVector(const Type &type) {
 	int count = 0;
 	if (token_ != ']') for (;;) {
 		Value val;
@@ -453,7 +453,7 @@ uoffset_t Parser::ParseVector(const Type &type) {
 		// start at the back, since we're building the data backwards.
 		auto &val = field_stack_.back().first;
 		switch (val.type.base_type) {
-			#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) \
+			#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) \
 				case BASE_TYPE_ ## ENUM: \
 					if (IsStruct(val.type)) SerializeStruct(*val.type.struct_def, val); \
 					else builder_.PushElement(atot<CTYPE>(val.constant.c_str())); \
@@ -482,10 +482,7 @@ void Parser::ParseMetaData(Definition &def) {
 	}
 }
 
-bool Parser::TryTypedValue(int dtoken,
-													 bool check,
-													 Value &e,
-													 BaseType req) {
+bool Parser::TryTypedValue(int dtoken, bool check, Value &e, BaseType req) {
 	bool match = dtoken == token_;
 	if (match) {
 		e.constant = attribute_;
@@ -493,10 +490,10 @@ bool Parser::TryTypedValue(int dtoken,
 			if (e.type.base_type == BASE_TYPE_NONE) {
 				e.type.base_type = req;
 			} else {
-				Error(std::string("type mismatch: expecting: ") +
-							kTypeNames[e.type.base_type] +
-							", found: " +
-							kTypeNames[req]);
+				Error(std::string("Type mismatch: expecting: ") +
+					  kTypeNames[e.type.base_type] +
+					  ", found: " +
+					  kTypeNames[req]);
 			}
 		}
 		Next();
@@ -525,9 +522,9 @@ void Parser::ParseSingleValue(Value &e) {
 				return;
 			}
 		}
-		Error("not valid enum value: " + attribute_);
+		Error("Not valid enum value: " + attribute_);
 	} else {
-		Error("cannot parse value starting with: " + TokenToString(token_));
+		Error("Cannot parse value starting with: " + TokenToString(token_));
 	}
 }
 
@@ -553,7 +550,7 @@ void Parser::ParseEnum(bool is_union) {
 	enum_def.name = name;
 	enum_def.doc_comment = dc;
 	enum_def.is_union = is_union;
-	if (enums_.Add(name, &enum_def)) Error("enum already exists: " + name);
+	if (enums_.Add(name, &enum_def)) Error("Enum already exists: " + name);
 	if (is_union) {
 		enum_def.underlying_type.base_type = BASE_TYPE_UTYPE;
 		enum_def.underlying_type.enum_def = &enum_def;
@@ -562,7 +559,7 @@ void Parser::ParseEnum(bool is_union) {
 		// though people are encouraged to pick any integer type instead.
 		ParseType(enum_def.underlying_type);
 		if (!IsInteger(enum_def.underlying_type.base_type))
-			Error("underlying enum type must be integral");
+			Error("Underlying enum type must be integral");
 	} else {
 		enum_def.underlying_type.base_type = BASE_TYPE_SHORT;
 	}
@@ -579,7 +576,7 @@ void Parser::ParseEnum(bool is_union) {
 												? enum_def.vals.vec.back()->value + 1
 												: 0));
 		if (enum_def.vals.Add(name, &ev))
-			Error("enum value already exists: " + name);
+			Error("Enum value already exists: " + name);
 		ev.doc_comment = dc;
 		if (is_union) {
 			ev.struct_def = LookupCreateStruct(name);
@@ -588,7 +585,7 @@ void Parser::ParseEnum(bool is_union) {
 			ev.value = atoi(attribute_.c_str());
 			Expect(kTokenIntegerConstant);
 			if (prevsize && enum_def.vals.vec[prevsize - 1]->value >= ev.value)
-				Error("enum values must be specified in ascending order");
+				Error("Enum values must be specified in ascending order");
 		}
 	} while (IsNext(','));
 	Expect('}');
@@ -601,7 +598,7 @@ void Parser::ParseDecl() {
 	std::string name = attribute_;
 	Expect(kTokenIdentifier);
 	auto &struct_def = *LookupCreateStruct(name);
-	if (!struct_def.predecl) Error("datatype already exists: " + name);
+	if (!struct_def.predecl) Error("Datatype already exists: " + name);
 	struct_def.predecl = false;
 	struct_def.name = name;
 	struct_def.doc_comment = dc;
@@ -612,19 +609,19 @@ void Parser::ParseDecl() {
 	structs_.vec.back() = &struct_def;
 	ParseMetaData(struct_def);
 	struct_def.sortbysize =
-		struct_def.attributes.Lookup("original_order") == nullptr && !fixed;
+		struct_def.attributes.Lookup("Original_order") == nullptr && !fixed;
 	Expect('{');
 	while (token_ != '}') ParseField(struct_def);
 	struct_def.PadLastField(struct_def.minalign);
 	Expect('}');
-	auto force_align = struct_def.attributes.Lookup("force_align");
+	auto force_align = struct_def.attributes.Lookup("Force_align");
 	if (fixed && force_align) {
 		auto align = static_cast<size_t>(atoi(force_align->constant.c_str()));
 		if (force_align->type.base_type != BASE_TYPE_INT ||
 				align < struct_def.minalign ||
 				align > 256 ||
 				align & (align - 1))
-			Error("force_align must be a power of two integer ranging from the"
+			Error("Force_align must be a power of two integer ranging from the"
 						"struct\'s natural alignment to 256");
 		struct_def.minalign = align;
 	}
@@ -652,9 +649,9 @@ bool Parser::Parse(const char *source) {
 				}
 				Expect(';');
 			} else if (token_ == '{') {
-				if (!root_struct_def) Error("no root type set to parse json with");
+				if (!root_struct_def) Error("No root type set to parse json with");
 				if (builder_.GetSize()) {
-					Error("cannot have more than one json object in a file");
+					Error("Cannot have more than one json object in a file");
 				}
 				builder_.Finish(Offset<Info>(ParseInfo(*root_struct_def)));
 			} else if (token_ == kTokenEnum) {
@@ -667,31 +664,31 @@ bool Parser::Parse(const char *source) {
 				Expect(kTokenIdentifier);
 				Expect(';');
 				if (!SetRootType(root_type.c_str()))
-					Error("unknown root type: " + root_type);
+					Error("Unknown root type: " + root_type);
 				if (root_struct_def->fixed)
-					Error("root type must be a info");
+					Error("Root type must be a info");
 			} else {
 				ParseDecl();
 			}
 		}
 		for (auto it = structs_.vec.begin(); it != structs_.vec.end(); ++it) {
 			if ((*it)->predecl)
-				Error("type referenced but not defined: " + (*it)->name);
+				Error("Type referenced but not defined: " + (*it)->name);
 		}
 		for (auto it = enums_.vec.begin(); it != enums_.vec.end(); ++it) {
 			auto &enum_def = **it;
 			if (enum_def.is_union) {
 				for (auto it = enum_def.vals.vec.begin();
-						 it != enum_def.vals.vec.end();
-						 ++it) {
+					 it != enum_def.vals.vec.end();
+					 ++it) {
 					auto &val = **it;
 					if (val.struct_def && val.struct_def->fixed)
-						Error("only infos can be union elements: " + val.name);
+						Error("Only infos can be union elements: " + val.name);
 				}
 			}
 		}
 	} catch (const std::string &msg) {
-		error_ = "line " + NumToString(line_) + ": " + msg;
+		error_ = "Line " + NumToString(line_) + ": " + msg;
 		return false;
 	}
 	assert(!struct_stack_.size());

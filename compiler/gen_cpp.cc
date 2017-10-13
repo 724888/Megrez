@@ -14,16 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#include "megrez/megrez.h"
+#include "megrez/basic.h"
+#include "megrez/builder.h"
 #include "megrez/idl.h"
-#include "megrez/utils.h"
+#include "megrez/info.h"
+#include "megrez/string.h"
+#include "megrez/struct.h"
+#include "megrez/vector.h"
+#include "megrez/util.h"
 
 namespace megrez {
 namespace cpp {
 
 static std::string GenTypeBasic(const Type &type) {
 	static const char *ctypename[] = {
-		#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE, JTYPE) #CTYPE,
+		#define MEGREZ_TD(ENUM, IDLTYPE, CTYPE) #CTYPE,
 			MEGREZ_GEN_TYPES(MEGREZ_TD)
 		#undef MEGREZ_TD
 	};
@@ -76,8 +81,8 @@ static void GenEnum(EnumDef &enum_def, std::string *code_ptr) {
 			 it != enum_def.vals.vec.end();
 			 ++it) {
 		auto &ev = **it;
-		GenComment(ev.doc_comment, code_ptr, "  ");
-		code += "  " + enum_def.name + "_" + ev.name + " = ";
+		GenComment(ev.doc_comment, code_ptr, "\t");
+		code += "\t" + enum_def.name + "_" + ev.name + " = ";
 		code += NumToString(ev.value) + ",\n";
 	}
 	code += "};\n\n";
@@ -85,7 +90,7 @@ static void GenEnum(EnumDef &enum_def, std::string *code_ptr) {
 	static const int kMaxSparseness = 5;
 	if (range / static_cast<int>(enum_def.vals.vec.size()) < kMaxSparseness) {
 		code += "inline const char **EnumNames" + enum_def.name + "() {\n";
-		code += "  static const char *names[] = { ";
+		code += "\tstatic const char *names[] = { ";
 		int val = enum_def.vals.vec.front()->value;
 		for (auto it = enum_def.vals.vec.begin();
 				 it != enum_def.vals.vec.end();
@@ -93,7 +98,7 @@ static void GenEnum(EnumDef &enum_def, std::string *code_ptr) {
 			while (val++ != (*it)->value) code += "\"\", ";
 			code += "\"" + (*it)->name + "\", ";
 		}
-		code += "nullptr };\n  return names;\n}\n\n";
+		code += "nullptr };\n\treturn names;\n}\n\n";
 		code += "inline const char *EnumName" + enum_def.name;
 		code += "(int e) { return EnumNames" + enum_def.name + "()[e";
 		if (enum_def.vals.vec.front()->value)
@@ -112,8 +117,8 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 			 ++it) {
 		auto &field = **it;
 		if (!field.deprecated) {  // Deprecated fields won't be accessible.
-			GenComment(field.doc_comment, code_ptr, "  ");
-			code += "  " + GenTypeGet(field.value.type, " ", "const ", " *");
+			GenComment(field.doc_comment, code_ptr, "\t");
+			code += "\t" + GenTypeGet(field.value.type, " ", "const ", " *");
 			code += field.name + "() const { return ";
 			// Call a different accessor for pointers, that indirects.
 			code += IsScalar(field.value.type.base_type)
@@ -129,14 +134,14 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 	}
 	code += "};\n\n";
 	code += "struct " + struct_def.name;
-	code += "Builder {\n  megrez::MegrezBuilder &mb_;\n";
-	code += "  megrez::uoffset_t start_;\n";
+	code += "Builder {\n\tmegrez::MegrezBuilder &mb_;\n";
+	code += "\tmegrez::uofs_t start_;\n";
 	for (auto it = struct_def.fields.vec.begin();
-			 it != struct_def.fields.vec.end();
-			 ++it) {
+		 it != struct_def.fields.vec.end();
+		 ++it) {
 		auto &field = **it;
 		if (!field.deprecated) {
-			code += "  void add_" + field.name + "(";
+			code += "\tvoid add_" + field.name + "(";
 			code += GenTypeWire(field.value.type, " ") + field.name + ") { mb_.Add";
 			if (IsScalar(field.value.type.base_type))
 				code += "Element<" + GenTypeWire(field.value.type, "") + ">";
@@ -150,10 +155,10 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 			code += "); }\n";
 		}
 	}
-	code += "  " + struct_def.name;
+	code += "\t" + struct_def.name;
 	code += "Builder(megrez::MegrezBuilder &_mb) : mb_(_mb) ";
 	code += "{ start_ = mb_.StartInfo(); }\n";
-	code += "  megrez::Offset<" + struct_def.name;
+	code += "\tmegrez::Offset<" + struct_def.name;
 	code += "> Finish() { return megrez::Offset<" + struct_def.name;
 	code += ">(mb_.EndInfo(start_, ";
 	code += NumToString(struct_def.fields.vec.size()) + ")); }\n};\n\n";
@@ -168,8 +173,8 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 			code += ", " + GenTypeWire(field.value.type, " ") + field.name;
 		}
 	}
-	code += ") {\n  " + struct_def.name + "Builder builder_(_mb);\n";
-	for (size_t size = struct_def.sortbysize ? sizeof(largest_scalar_t) : 1;
+	code += ") {\n\t" + struct_def.name + "Builder builder_(_mb);\n";
+	for (size_t size = struct_def.sortbysize ? sizeof(max_scalar_t) : 1;
 			 size;
 			 size /= 2) {
 		for (auto it = struct_def.fields.vec.rbegin();
@@ -179,11 +184,11 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 			if (!field.deprecated &&
 					(!struct_def.sortbysize ||
 					 size == SizeOf(field.value.type.base_type))) {
-				code += "  builder_.add_" + field.name + "(" + field.name + ");\n";
+				code += "\tbuilder_.add_" + field.name + "(" + field.name + ");\n";
 			}
 		}
 	}
-	code += "  return builder_.Finish();\n}\n\n";
+	code += "\treturn builder_.Finish();\n}\n\n";
 }
 
 // Generate an accessor struct with constructor for a megrez struct.
@@ -198,17 +203,17 @@ static void GenStruct(StructDef &struct_def, std::string *code_ptr) {
 			 it != struct_def.fields.vec.end();
 			 ++it) {
 		auto &field = **it;
-		code += "  " + GenTypeGet(field.value.type, " ", "", " ");
+		code += "\t" + GenTypeGet(field.value.type, " ", "", " ");
 		code += field.name + "_;\n";
 		if (field.padding) {
 			for (int i = 0; i < 4; i++)
 				if (static_cast<int>(field.padding) & (1 << i))
-					code += "  int" + NumToString((1 << i) * 8) +
+					code += "\tint" + NumToString((1 << i) * 8) +
 									"_t __padding" + NumToString(padding_id++) + ";\n";
 			assert(!(field.padding & ~0xF));
 		}
 	}
-	code += "\n public:\n  " + struct_def.name + "(";
+	code += "\n public:\n\t" + struct_def.name + "(";
 	for (auto it = struct_def.fields.vec.begin();
 			 it != struct_def.fields.vec.end();
 			 ++it) {
@@ -216,7 +221,7 @@ static void GenStruct(StructDef &struct_def, std::string *code_ptr) {
 		if (it != struct_def.fields.vec.begin()) code += ", ";
 		code += GenTypeGet(field.value.type, " ", "const ", " &") + field.name;
 	}
-	code += ")\n    : ";
+	code += ")\n\t\t: ";
 	padding_id = 0;
 	for (auto it = struct_def.fields.vec.begin();
 			 it != struct_def.fields.vec.end();
@@ -236,8 +241,8 @@ static void GenStruct(StructDef &struct_def, std::string *code_ptr) {
 			 it != struct_def.fields.vec.end();
 			 ++it) {
 		auto &field = **it;
-		GenComment(field.doc_comment, code_ptr, "  ");
-		code += "  " + GenTypeGet(field.value.type, " ", "const ", " &");
+		GenComment(field.doc_comment, code_ptr, "\t");
+		code += "\t" + GenTypeGet(field.value.type, " ", "const ", " &");
 		code += field.name + "() const { return ";
 		if (IsScalar(field.value.type.base_type))
 			code += "megrez::EndianScalar(" + field.name + "_)";
@@ -276,7 +281,13 @@ std::string GenerateCPP(const Parser &parser) {
 	if (enum_code.length() || forward_decl_code.length() || decl_code.length()) {
 		std::string code;
 		code = "// Automatically generated by MegrezCompiler, DO NOT MODIFY!\n\n";
-		code += "#include <megrez/megrez.h>\n\n";
+		code += "#include <megrez/basic.h>\n";
+		code += "#include <megrez/builder.h>\n";
+		code += "#include <megrez/info.h>\n";
+		code += "#include <megrez/string.h>\n";
+		code += "#include <megrez/struct.h>\n";
+		code += "#include <megrez/vector.h>\n\n";
+
 		for (auto it = parser.name_space_.begin();
 				 it != parser.name_space_.end(); ++it) {
 			code += "namespace " + *it + " {\n";
@@ -303,9 +314,7 @@ std::string GenerateCPP(const Parser &parser) {
 	return std::string();
 }
 
-bool GenerateCPP(const Parser &parser,
-				 const std::string &path,
-				 const std::string &file_name) {
+bool GenerateCPP(const Parser &parser, const std::string &path, const std::string &file_name) {
 	auto code = GenerateCPP(parser);
 	return !code.length() ||
 			SaveFile((path + file_name + ".mgz.h").c_str(), code, false);

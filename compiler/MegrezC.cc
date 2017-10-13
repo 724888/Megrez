@@ -14,12 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#include "megrez/megrez.h"
+#include "megrez/basic.h"
+#include "megrez/builder.h"
 #include "megrez/idl.h"
-#include "megrez/utils.h"
+#include "megrez/info.h"
+#include "megrez/string.h"
+#include "megrez/struct.h"
+#include "megrez/vector.h"
+#include "megrez/util.h"
 
 void Error(const char *err, const char *obj = nullptr, bool usage = false);
-
+/*
 namespace megrez {
 
 bool GenerateBinary(const Parser &parser,
@@ -44,7 +49,7 @@ bool GenerateTextFile(const Parser &parser,
 }
 
 }
-
+*/
 struct Generator {
 	bool (*generate)(const megrez::Parser &parser,
 					 const std::string &path,
@@ -55,8 +60,8 @@ struct Generator {
 };
 
 const Generator generators[] = {
-	{ megrez::GenerateBinary, "b", "binary", "Generate wire format binaries for any data definitions" },
-	{ megrez::GenerateTextFile, "t", "text", "Generate text output for any data definitions" },
+	//{ megrez::GenerateBinary, "b", "binary", "Generate wire format binaries for any data definitions" },
+	//{ megrez::GenerateTextFile, "t", "text", "Generate text output for any data definitions" },
 	{ megrez::GenerateCPP, "c", "C++", "Generate C++ headers for infos/structs" },
 
 };
@@ -75,7 +80,7 @@ void Error(const char *err, const char *obj, bool usage) {
 			   "FILEs may depend on declarations in earlier files.\n"
 			   "Output files are named using the base file name of the input,"
 			   "and written to the current directory or the path given by -o.\n"
-			   "example: %s -c -b schema1.mgz schema2.mgz data.json\n",
+			   "example: %s -c -b schema1.mgz\n",
 			   program_name);
 	}
 	exit(1);
@@ -97,11 +102,11 @@ int main(int argc, const char *argv[]) {
 	for (int i = 1; i < argc; i++) {
 		const char *arg = argv[i];
 		if (arg[0] == '-') {
-			if (filenames.size()) { Error("invalid option location", arg, true); }
-			if (strlen(arg) != 2) { Error("invalid commandline argument", arg, true); }
+			if (filenames.size()) { Error("Invalid option location", arg, true); }
+			if (strlen(arg) != 2) { Error("Invalid commandline argument", arg, true); }
 			switch (arg[1]) {
 				case 'o':
-					if (++i >= argc) { Error("missing path following", arg, true); }
+					if (++i >= argc) { Error("Missing path following", arg, true); }
 					output_path = argv[i];
 					break;
 				default:
@@ -112,7 +117,7 @@ int main(int argc, const char *argv[]) {
 							goto found;
 						}
 					}
-					Error("unknown commandline argument", arg, true);
+					Error("Unknown commandline argument", arg, true);
 					found:
 					break;
 			}
@@ -122,7 +127,7 @@ int main(int argc, const char *argv[]) {
 	if (!filenames.size()) {Error("Missing input files", nullptr, true);}
 	if (!any_generator) { 
 		Error("No options: no output files generated.",
-			  "specify one of -c -t -b etc.", true); 
+			  "Specify one of -c.", true); 
 	}
 
 	// Now process the files:
@@ -131,7 +136,7 @@ int main(int argc, const char *argv[]) {
 		 ++file_it) {
 			std::string contents;
 			if (!megrez::LoadFile(file_it->c_str(), true, &contents))
-				{ Error("unable to load file", file_it->c_str()); }
+				{ Error("Unable to load file", file_it->c_str()); }
 			if (!parser.Parse(contents.c_str()))
 				{ Error(parser.error_.c_str()); }
 

@@ -13,20 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 2.8)
 project(Megrez)
 
 set(CMAKE_CXX_STANDARD 11)
 set(MegrezCompilerSrc
-	megrez/megrez.h
+	megrez/basic.h
+	megrez/builder.h
 	megrez/idl.h
-	megrez/utils.h
+	megrez/info.h
+	megrez/string.h
+	megrez/struct.h
+	megrez/vector.h
+	megrez/util.h
 	compiler/parser.cc
-	compiler/idl_gen_cpp.cc
-	compiler/idl_gen_text.cc
-	compiler/main.cc
+	compiler/gen_cpp.cc
+	compiler/MegrezC.cc
 )
 
 include_directories(.)
-add_executable(MegrezCompiler ${MegrezCompilerSrc})
+add_executable(MegrezC ${MegrezCompilerSrc})
