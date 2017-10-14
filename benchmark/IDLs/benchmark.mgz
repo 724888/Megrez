@@ -14,18 +14,26 @@
 
 namespace benchmark; 
   
-enum GENDER_TYPE : byte {  
-	MALE = 0,  
-	FEMALE = 1,  
-	OTHER = 2  
+enum ENUM : byte {
+	val1 = 0,
+	val2 = 1,
+	val3 = 3
 }
 
-info Person {
-	id : uint;  
-	name : string;  
-	age : byte;  
-	gender : GENDER_TYPE;  
-	phone_num : ulong;  
+info INFO {
+	field1 : bool;
+	field2 : byte;
+	field3 : ubyte;
+	field4 : short;
+	field5 : ushort;
+	field6 : int;
+	field7 : uint;
+	field8 : long;
+	field9 : ulong;
+	field10 : float;
+	field11 : double;
+	field12 : string;
+	field13 : ENUM;
 }
 
-Main Person;
+Main INFO;

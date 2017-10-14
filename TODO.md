@@ -13,3 +13,5 @@
 **6. Write the api document.**
 
 **7. To support importing files.**
+
+**8. Automatical compile.**
