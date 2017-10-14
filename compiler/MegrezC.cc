@@ -24,32 +24,7 @@ limitations under the License.
 #include "compiler/idl.h"
 
 void Error(const char *err, const char *obj = nullptr, bool usage = false);
-/*
-namespace megrez {
 
-bool GenerateBinary(const Parser &parser,
-					const std::string &path,
-					const std::string &file_name) {
-	return !parser.builder_.GetSize() ||
-			megrez::SaveFile(
-				(path + file_name + "_wire.bin").c_str(),
-				reinterpret_cast<char *>(parser.builder_.GetBufferPointer()),
-				parser.builder_.GetSize(),
-				true);
-}
-
-bool GenerateTextFile(const Parser &parser,
-					  const std::string &path,
-					  const std::string &file_name) {
-	if (!parser.builder_.GetSize()) return true;
-	if (!parser.root_struct_def) Error("root_type not set");
-	std::string text;
-	GenerateText(parser, parser.builder_.GetBufferPointer(), 2, &text);
-	return megrez::SaveFile((path + file_name + "_wire.txt").c_str(), text, false);
-}
-
-}
-*/
 struct Generator {
 	bool (*generate)(const megrez::Parser &parser,
 					 const std::string &path,
@@ -60,10 +35,7 @@ struct Generator {
 };
 
 const Generator generators[] = {
-	//{ megrez::GenerateBinary, "b", "binary", "Generate wire format binaries for any data definitions" },
-	//{ megrez::GenerateTextFile, "t", "text", "Generate text output for any data definitions" },
-	{ megrez::GenerateCPP, "c", "C++", "Generate C++ headers for infos/structs" },
-
+	{ megrez::GenerateCPP, "c", "C++", "Generate C++ header files;" }
 };
 
 const char *program_name = NULL;
@@ -80,7 +52,7 @@ void Error(const char *err, const char *obj, bool usage) {
 			   "FILEs may depend on declarations in earlier files.\n"
 			   "Output files are named using the base file name of the input,"
 			   "and written to the current directory or the path given by -o.\n"
-			   "example: %s -c -b schema1.mgz\n",
+			   "example: %s -c schema1.mgz\n",
 			   program_name);
 	}
 	exit(1);

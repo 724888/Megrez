@@ -14,51 +14,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#include "./test.mgz.h"
+#include "./IDLs/benchmark.mgz.h"
 #include <iostream>
 #include <chrono> 
 
-using namespace Megrez::Test;
-using namespace megrez;
+using namespace benchmark;
 using namespace std;
+using namespace megrez;
 using namespace chrono;
 
-const Person* Serialize() {
-	vector<uint64_t> vec;
-	for (size_t i=0; i<10; i++) 
-		vec.push_back(i);
+void serialize() {
 	MegrezBuilder mb;
-	auto addr = address(1, 1, 1);
-	auto name = mb.CreateString("Jiang");
-	auto lc = mb.CreateVector(vec);
-	auto elder_ = CreatePerson(mb, &addr, 92, name, lc, Color_Black);
-	mb.Finish(elder_);
-	const Person *elder = GetPerson(mb.GetBufferPointer());
-	return elder;
+	auto id = 123456;
+	auto name = mb.CreateString("NAME");
+	auto age = 100;
+	auto gender = GENDER_TYPE_MALE;
+	auto phone_num = 10000000000;
+
+	auto temp = CreatePerson(mb, id, name, age, gender, phone_num);
+	mb.Finish(temp);
+	auto serialized = GetPerson(mb.GetBufferPointer());
 }
 
-
 int main() {
-	const Person* elder;
+	cout << "Megrez Benchmark" << endl;
 	auto start = system_clock::now();
 	for (int i=1; i<=10000; i++)
-		elder = Serialize();
+		serialize();
 	auto end = system_clock::now();
 	auto duration = duration_cast<nanoseconds>(end - start);
 	cout << "Serialization time: " 
 		 << double(duration.count()) * nanoseconds::period::num / nanoseconds::period::den 
-		 << "(nanoseconds).\n\n";
+		 << "(nanoseconds).\n";
 
-	cout << elder->name()->c_str() << endl << endl;
-	cout << elder->age() << endl << endl;
-	cout << elder->Address()->block() << endl;
-	cout << elder->Address()->street() << endl;
-	cout << elder->Address()->number() << endl << endl;
-	cout << elder->LifeContinue()->Get(1) << endl;
-	cout << elder->LifeContinue()->Get(2) << endl;
-	cout << elder->LifeContinue()->Get(3) << endl << endl;
-	if (elder->GlassColor() == Color_Black)
-		cout << "Black Glass [=]-[=]!";
 	cin.get();
 	cin.get();
 	return 0;

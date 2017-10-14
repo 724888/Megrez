@@ -14,18 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_STRING_H_
-#define MEGREZ_STRING_H_
+#include "./IDLs/benchmark.pb.h"
+#include <iostream>
+#include <chrono>
 
-#include <string.h>
-#include "megrez/vector.h"
+using namespace benchmark;
+using namespace std;
+using namespace chrono;
 
-namespace megrez {
+void serialize() {
+	Person person;
+	person.set_id(123456);
+	person.set_name("NAME");
+	person.set_age(100);
+	person.set_gender(MALE);
+}
 
-struct String : public Vector<char> {
-	const char *c_str() const { return reinterpret_cast<const char *>(Data()); }
-};
+int main() {
+	cout << "Megrez Benchmark" << endl;
+	auto start = system_clock::now();
+	for (int i=1; i<=10000; i++)
+		serialize();
+	auto end = system_clock::now();
+	auto duration = duration_cast<nanoseconds>(end - start);
+	cout << "Serialization time: " 
+		 << double(duration.count()) * nanoseconds::period::num / nanoseconds::period::den 
+		 << "(nanoseconds).\n";
 
-} // namespace megrez
-
-#endif // MEGREZ_STRING_H_
+	cin.get();
+	cin.get();
+	return 0;
+}

@@ -48,10 +48,10 @@ namespace megrez {
 	TD(FLOAT,  "float",  float)     \
 	TD(DOUBLE, "double", double)
 #define MEGREZ_GEN_TYPES_POINTER(TD) \
-	TD(STRING, "string", Offset<void>/*, int*/) \
-	TD(VECTOR, "",       Offset<void>/*, int*/) \
-	TD(STRUCT, "",       Offset<void>/*, int*/) \
-	TD(UNION,  "",       Offset<void>/*, int*/)
+	TD(STRING, "string", Offset<void>) \
+	TD(VECTOR, "",       Offset<void>) \
+	TD(STRUCT, "",       Offset<void>) \
+	TD(UNION,  "",       Offset<void>)
 #define MEGREZ_GEN_TYPES(TD) \
 		MEGREZ_GEN_TYPES_SCALAR(TD) \
 		MEGREZ_GEN_TYPES_POINTER(TD)
