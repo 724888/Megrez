@@ -196,12 +196,12 @@ struct EnumDef : public Definition {
 class Parser {
  public:
 	Parser() :
-		root_struct_def(nullptr),
+		main_struct_def(nullptr),
 		source_(nullptr),
 		cursor_(nullptr),
 		line_(1) {}
 	bool Parse(const char *_source);
-	bool SetRootType(const char *name);
+	bool SetMainType(const char *name);
 
  private:
 	void Next();
@@ -228,7 +228,7 @@ class Parser {
 	std::vector<std::string> name_space_;  // As set in the schema.
 	std::string error_;         // User readable error_ if Parse() == false
 	MegrezBuilder builder_;  // any data contained in the file
-	StructDef *root_struct_def;
+	StructDef *main_struct_def;
 
  private:
 	const char *source_, *cursor_;

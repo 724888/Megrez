@@ -76,7 +76,7 @@ inline Offset<void> atot<Offset<void>>(const char *s) { return Offset<void>(atoi
 	TD(Enum, 263, "enum") \
 	TD(Union, 264, "union") \
 	TD(NameSpace, 265, "namespace") \
-	TD(RootType, 266, "root_type")
+	TD(MainType, 266, "Main")
 enum {
 	#define MEGREZ_TOKEN(NAME, VALUE, STRING) kToken ## NAME,
 		MEGREZ_GEN_TOKENS(MEGREZ_TOKEN)
@@ -183,7 +183,7 @@ void Parser::Next() {
 					if (attribute_ == "enum")      { token_ = kTokenEnum;      return; }
 					if (attribute_ == "union")     { token_ = kTokenUnion;     return; }
 					if (attribute_ == "namespace") { token_ = kTokenNameSpace; return; }
-					if (attribute_ == "root_type") { token_ = kTokenRootType;  return; }
+					if (attribute_ == "Main") { token_ = kTokenMainType;  return; }
 					// If not, it is a user-defined identifier:
 					token_ = kTokenIdentifier;
 					return;
@@ -627,9 +627,9 @@ void Parser::ParseDecl() {
 	}
 }
 
-bool Parser::SetRootType(const char *name) {
-	root_struct_def = structs_.Lookup(name);
-	return root_struct_def != nullptr;
+bool Parser::SetMainType(const char *name) {
+	main_struct_def = structs_.Lookup(name);
+	return main_struct_def != nullptr;
 }
 
 bool Parser::Parse(const char *source) {
@@ -649,24 +649,24 @@ bool Parser::Parse(const char *source) {
 				}
 				Expect(';');
 			} else if (token_ == '{') {
-				if (!root_struct_def) Error("No root type set to parse json with");
+				if (!main_struct_def) Error("No main type set to parse json with");
 				if (builder_.GetSize()) {
 					Error("Cannot have more than one json object in a file");
 				}
-				builder_.Finish(Offset<Info>(ParseInfo(*root_struct_def)));
+				builder_.Finish(Offset<Info>(ParseInfo(*main_struct_def)));
 			} else if (token_ == kTokenEnum) {
 				ParseEnum(false);
 			} else if (token_ == kTokenUnion) {
 				ParseEnum(true);
-			} else if (token_ == kTokenRootType) {
+			} else if (token_ == kTokenMainType) {
 				Next();
-				auto root_type = attribute_;
+				auto Main = attribute_;
 				Expect(kTokenIdentifier);
 				Expect(';');
-				if (!SetRootType(root_type.c_str()))
-					Error("Unknown root type: " + root_type);
-				if (root_struct_def->fixed)
-					Error("Root type must be a info");
+				if (!SetMainType(Main.c_str()))
+					Error("Unknown main type: " + Main);
+				if (main_struct_def->fixed)
+					Error("Main type must be a info");
 			} else {
 				ParseDecl();
 			}
@@ -683,7 +683,7 @@ bool Parser::Parse(const char *source) {
 					 ++it) {
 					auto &val = **it;
 					if (val.struct_def && val.struct_def->fixed)
-						Error("Only infos can be union elements: " + val.name);
+						Error("Only info can be union elements: " + val.name);
 				}
 			}
 		}

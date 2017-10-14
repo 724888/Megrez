@@ -1,5 +1,10 @@
 # Release Doc
 
+## v0.0.6
+
+> **Break Changes**
+**1. Change `root_type` to `Main`.**
+
 ## v0.0.5
 > **Time: 2017/10/14**
 

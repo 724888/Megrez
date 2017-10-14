@@ -297,11 +297,11 @@ std::string GenerateCPP(const Parser &parser) {
 		code += forward_decl_code;
 		code += "\n";
 		code += decl_code;
-		if (parser.root_struct_def) {
-			code += "inline const " + parser.root_struct_def->name + " *Get";
-			code += parser.root_struct_def->name;
+		if (parser.main_struct_def) {
+			code += "inline const " + parser.main_struct_def->name + " *Get";
+			code += parser.main_struct_def->name;
 			code += "(const void *buf) { return megrez::GetRoot<";
-			code += parser.root_struct_def->name + ">(buf); }\n\n";
+			code += parser.main_struct_def->name + ">(buf); }\n\n";
 		}
 		for (auto it = parser.name_space_.begin();
 				 it != parser.name_space_.end(); ++it) {
