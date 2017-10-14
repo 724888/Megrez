@@ -9,4 +9,4 @@ make
 echo
 echo -------------------------------Done--------------------------------
 echo
-read -p "Press Any Keys to Exit......"
+read -p "Press [ENTER] to Exit......"
