@@ -1,10 +1,17 @@
 # Release Doc
 
 ## v0.0.6
+> **Time: 2017/10/15**
 
 > **Break Changes**
 **1. Change `root_type` to `Main`.**
-**2. Make the compiler supports `--cpp` command**
+**2. Make the compiler supports `--cpp` command.**
+**3. Allows to direct initialization string without `CreateString()`.**
+
+> **NEXT GOAL**
+1. Rewrite the basic of Megrez.
+2. Make Megrez supports C++ STL.
+3. Make the IDL supports mutiline comments.
 
 ## v0.0.5
 > **Time: 2017/10/14**

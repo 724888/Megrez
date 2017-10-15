@@ -112,8 +112,8 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 	if (struct_def.generated) return;
 	std::string &code = *code_ptr;
 	GenComment(struct_def.doc_comment, code_ptr);
-	code += "class " + struct_def.name + " : private megrez::Info";
-	code += " {\n public:\n";
+	code += "struct " + struct_def.name + " : private megrez::Info";
+	code += " {\n";
 	for (auto it = struct_def.fields.vec.begin();
 			 it != struct_def.fields.vec.end();
 			 ++it) {
@@ -320,7 +320,7 @@ std::string GenerateCPP(const Parser &parser) {
 	for (auto it = parser.structs_.vec.begin();
 			 it != parser.structs_.vec.end(); ++it) {
 		if (!(*it)->generated)
-			forward_decl_code += "class " + (*it)->name + ";\n";
+			forward_decl_code += "struct " + (*it)->name + ";\n";
 	}
 	std::string decl_code;
 	for (auto it = parser.structs_.vec.begin();
