@@ -27,9 +27,10 @@ const Person* Serialize() {
 	vector<uint64_t> vec;
 	for (size_t i=0; i<10; i++) 
 		vec.push_back(i);
-	MegrezBuilder mb;
+	MegrezBuilder mb(4096);
 	auto addr = address(1, 1, 1);
-	auto name = mb.CreateString("Jiang");
+	//auto name = mb.CreateString("Jiang");
+	string name = "Jiang";
 	auto lc = mb.CreateVector(vec);
 	auto elder_ = CreatePerson(mb, &addr, 92, name, lc, Color_Black);
 	mb.Finish(elder_);

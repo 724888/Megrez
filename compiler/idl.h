@@ -69,6 +69,7 @@ enum BaseType {
 inline bool IsScalar (BaseType t) { return t >= BASE_TYPE_UTYPE &&	t <= BASE_TYPE_DOUBLE; }
 inline bool IsInteger(BaseType t) { return t >= BASE_TYPE_UTYPE &&	t <= BASE_TYPE_ULONG; }
 inline bool IsFloat  (BaseType t) { return t == BASE_TYPE_FLOAT ||	t == BASE_TYPE_DOUBLE; }
+inline bool IsString (BaseType t) { return t == BASE_TYPE_STRING; }
 
 extern const char *const kTypeNames[];
 extern const char kTypeSizes[];

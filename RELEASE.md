@@ -4,6 +4,7 @@
 
 > **Break Changes**
 **1. Change `root_type` to `Main`.**
+**2. Make the compiler supports `--cpp` command**
 
 ## v0.0.5
 > **Time: 2017/10/14**

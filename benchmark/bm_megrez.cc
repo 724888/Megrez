@@ -34,38 +34,38 @@ void serialize() {
 	//auto temp = CreatePerson(mb, id, name, age, gender, phone_num);
 	//mb.Finish(temp);
 	//auto serialized = GetPerson(mb.GetBufferPointer());
+	megrez::MegrezBuilder mb(4096);
+	INFOBuilder builder(mb);
 
-	INFOBuilder *builder;
+	uint8_t field1 = 1;
+	int8_t field2 = 1;
+	uint8_t field3 = 1;
+	int16_t field4 = 1;
+	uint16_t field5 = 1;
+	int32_t field6 = 1;
+	uint32_t field7 = 1;
+	int64_t field8 = 1;
+	uint64_t field9 = 1;
+	float field10 = 1.0;
+	double field11 = 1.0;
 
-	uint8_t field1 = 0xFF;
-	int8_t field2 = 0x7F;
-	uint8_t field3 = 0xFF;
-	int16_t field4 = 0x7FFF;
-	uint16_t field5 = 0xFFFF;
-	int32_t field6 = 0x7FFFFFF;
-	uint32_t field7 = 0xFFFFFFF;
-	int64_t field8 = 0x7FFFFFFFFFFFFFFF;
-	uint64_t field9 = 0xFFFFFFFFFFFFFFFF;
-	float field10 = 3.4e+38;
-	double field11 = 1.7e+308;
+	builder.add_field1(field1);
 
-	builder -> add_field1(field1);
-	cout << "[CHECKED] " << "field1" << endl;
-	builder -> add_field2(field2);
-	builder -> add_field3(field3);
-	builder -> add_field4(field4);
-	builder -> add_field5(field5);
-	builder -> add_field6(field6);
-	builder -> add_field7(field7);
-	builder -> add_field8(field8);
-	builder -> add_field9(field9);
-	builder -> add_field10(field10);
-	builder -> add_field11(field11);
-	builder -> add_field12(builder -> mb_.CreateString("abcdefghijklmnopqrstuvwxyz"));
-	builder -> add_field13(ENUM_val2);
-	builder -> Finish();
+	builder.add_field2(field2);
+	builder.add_field3(field3);
+	builder.add_field4(field4);
+	builder.add_field5(field5);
+	builder.add_field6(field6);
+	builder.add_field7(field7);
+	builder.add_field8(field8);
+	builder.add_field9(field9);
+	builder.add_field10(field10);
+	builder.add_field11(field11);
+	builder.add_field12("abcdefghijklmnopqrstuvwxyz");
+	builder.add_field13(ENUM_val2);
+	builder.Finish();
 
-	auto serialized = GetINFO(builder -> mb_.GetBufferPointer());
+	auto serialized = GetINFO(builder.mb_.GetBufferPointer());
 }
 
 int main() {
@@ -80,6 +80,8 @@ int main() {
 		 << double(duration.count()) * nanoseconds::period::num / nanoseconds::period::den 
 		 << "(nanoseconds).\n";
 
+	INFO info;
+	cout << info.field12()->c_str();
 	cin.get();
 	cin.get();
 	return 0;

@@ -1,17 +1,20 @@
 ## TODO List
 
-**1. Make Megrez supports mutiline comments.**
+**Change all `struct` in generated file into `class`**
 
-**2. Make MegrezC supports more commands.**
+**Make Megrez supports mutiline comments.**
 
-**3. Make `megrez::String` supports direct initialization and deprecate `CreateString()`.**
+**Make MegrezC supports more commands.**
 
-**4. Make the generated file easier to use.**
+**Make `megrez::String` supports direct initialization and deprecate `CreateString()`.**
 
-**5. Make the IDL simpler.**
+**Make the generated file easier to use.**
 
-**6. Write the api document.**
+**Make the IDL simpler.**
 
-**7. To support importing files.**
+**Write the api document.**
 
-**8. Automatical compile.**
+**To support importing files.**
+
+**Automatical compile.**
+

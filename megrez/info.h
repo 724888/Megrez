@@ -23,11 +23,11 @@ namespace megrez {
 
 class Info {
  private:
-	Info() {};
-	Info(const Info &other) {};
 	uint8_t data_[1];
 	
  public:
+	Info() {};
+	Info(const Info &other) {};
 	vofs_t GetOptionalFieldOffset(vofs_t field) const {
 		auto vinfo = &data_ - ReadScalar<sofs_t>(&data_);
 		auto vtsize = ReadScalar<vofs_t>(vinfo);

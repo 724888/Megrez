@@ -58,6 +58,11 @@ struct PersonBuilder {
 	void add_Address(const address *Address) { mb_.AddStruct(4, Address); }
 	void add_age(int16_t age) { mb_.AddElement<int16_t>(6, age, 92); }
 	void add_name(megrez::Offset<megrez::String> name) { mb_.AddOffset(8, name); }
+	void add_name(std::string name) { 
+		megrez::MegrezBuilder b;
+		megrez::Offset<megrez::String> name_ = b.CreateString(name);
+		mb_.AddOffset(8, name_);
+	}
 	void add_LifeContinue(megrez::Offset<megrez::Vector<uint64_t>> LifeContinue) { mb_.AddOffset(10, LifeContinue); }
 	void add_GlassColor(int8_t GlassColor) { mb_.AddElement<int8_t>(12, GlassColor, 3); }
 	PersonBuilder(megrez::MegrezBuilder &_mb) : mb_(_mb) { start_ = mb_.StartInfo(); }
@@ -69,6 +74,23 @@ inline megrez::Offset<Person> CreatePerson(
 	  const address *Address,
 	  int16_t age,
 	  megrez::Offset<megrez::String> name,
+	  megrez::Offset<megrez::Vector<uint64_t>> LifeContinue,
+	  int8_t GlassColor) {
+
+	PersonBuilder builder_(_mb);
+	builder_.add_LifeContinue(LifeContinue);
+	builder_.add_name(name);
+	builder_.add_Address(Address);
+	builder_.add_age(age);
+	builder_.add_GlassColor(GlassColor);
+	return builder_.Finish();
+}
+
+inline megrez::Offset<Person> CreatePerson(
+	  megrez::MegrezBuilder &_mb,
+	  const address *Address,
+	  int16_t age,
+	  std::string name,
 	  megrez::Offset<megrez::Vector<uint64_t>> LifeContinue,
 	  int8_t GlassColor) {
 

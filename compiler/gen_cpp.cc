@@ -57,16 +57,18 @@ static std::string GenTypeWire(const Type &type, const char *postfix) {
 			? "const " + GenTypePointer(type) + " *"
 			: "megrez::Offset<" + GenTypePointer(type) + ">" + postfix;
 }
-static std::string GenTypeGet(const Type &type, const char *afterbasic,
-							  const char *beforeptr, const char *afterptr) {
+static std::string GenTypeGet(
+	  const Type &type, const char *afterbasic,
+	  const char *beforeptr, const char *afterptr) {
 	return IsScalar(type.base_type)
 		? GenTypeBasic(type) + afterbasic
 		: beforeptr + GenTypePointer(type) + afterptr;
 }
 
-static void GenComment(const std::string &dc,
-					   std::string *code_ptr,
-					   const char *prefix = "") {
+static void GenComment(
+	  const std::string &dc,
+	  std::string *code_ptr,
+	  const char *prefix = "") {
 	std::string &code = *code_ptr;
 	if (dc.length()) {
 		code += std::string(prefix) + "///" + dc + "\n";
@@ -153,6 +155,15 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 			if (IsScalar(field.value.type.base_type))
 				code += ", " + field.value.constant;
 			code += "); }\n";
+			if (IsString(field.value.type.base_type)) {
+				code += "\tvoid add_" + field.name + "(std::string " + field.name + ") { \n\t";
+				code += "\tmegrez::MegrezBuilder b;\n\t";
+				code += "\tmegrez::Offset<megrez::String> " + field.name + "_";
+				code += " = b.CreateString(" + field.name + ");\n\t";
+				code += "\tmb_.AddOffset(" + NumToString(field.value.offset) + ", ";
+				code += field.name + "_);\n\t";
+				code += "}\n";
+			}
 		}
 	}
 	code += "\t" + struct_def.name;
@@ -162,6 +173,9 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 	code += "> Finish() { return megrez::Offset<" + struct_def.name;
 	code += ">(mb_.EndInfo(start_, ";
 	code += NumToString(struct_def.fields.vec.size()) + ")); }\n};\n\n";
+
+
+	bool has_string_type = false;
 	code += "inline megrez::Offset<" + struct_def.name + "> Create";
 	code += struct_def.name;
 	code += "(\n\t  megrez::MegrezBuilder &_mb";
@@ -171,6 +185,9 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 		auto &field = **it;
 		if (!field.deprecated) {
 			code += ",\n\t  " + GenTypeWire(field.value.type, " ") + field.name;
+		}
+		if (IsString(field.value.type.base_type)) {
+			has_string_type = true;
 		}
 	}
 	code += ") {\n\n\t" + struct_def.name + "Builder builder_(_mb);\n";
@@ -189,6 +206,42 @@ static void GenInfo(StructDef &struct_def, std::string *code_ptr) {
 		}
 	}
 	code += "\treturn builder_.Finish();\n}\n\n";
+
+
+	if (has_string_type) {
+		code += "inline megrez::Offset<" + struct_def.name + "> Create";
+		code += struct_def.name;
+		code += "(\n\t  megrez::MegrezBuilder &_mb";
+		for (auto it = struct_def.fields.vec.begin();
+				 it != struct_def.fields.vec.end();
+				 ++it) {
+			auto &field = **it;
+			if (!field.deprecated && !IsString(field.value.type.base_type)) {
+				code += ",\n\t  " + GenTypeWire(field.value.type, " ") + field.name;
+			}
+			if (!field.deprecated && IsString(field.value.type.base_type)) {
+				code += ",\n\t  std::string " + field.name; 
+			}
+		}
+		code += ") {\n\n\t" + struct_def.name + "Builder builder_(_mb);\n";
+		for (size_t size = struct_def.sortbysize ? sizeof(max_scalar_t) : 1;
+				 size;
+				 size /= 2) {
+			for (auto it = struct_def.fields.vec.rbegin();
+					 it != struct_def.fields.vec.rend();
+					 ++it) {
+				auto &field = **it;
+				if (!field.deprecated &&
+						(!struct_def.sortbysize ||
+						 size == SizeOf(field.value.type.base_type))) {
+					code += "\tbuilder_.add_" + field.name + "(" + field.name + ");\n";
+				}
+			}
+		}
+		code += "\treturn builder_.Finish();\n}\n\n";
+	}
+
+
 }
 
 // Generate an accessor struct with constructor for a megrez struct.
@@ -267,7 +320,7 @@ std::string GenerateCPP(const Parser &parser) {
 	for (auto it = parser.structs_.vec.begin();
 			 it != parser.structs_.vec.end(); ++it) {
 		if (!(*it)->generated)
-			forward_decl_code += "struct " + (*it)->name + ";\n";
+			forward_decl_code += "class " + (*it)->name + ";\n";
 	}
 	std::string decl_code;
 	for (auto it = parser.structs_.vec.begin();

@@ -56,6 +56,11 @@ struct INFOBuilder {
 	void add_field10(float field10) { mb_.AddElement<float>(22, field10, 0); }
 	void add_field11(double field11) { mb_.AddElement<double>(24, field11, 0); }
 	void add_field12(megrez::Offset<megrez::String> field12) { mb_.AddOffset(26, field12); }
+	void add_field12(std::string field12) { 
+		megrez::MegrezBuilder b;
+		megrez::Offset<megrez::String> field12_ = b.CreateString(field12);
+		mb_.AddOffset(26, field12_);
+	}
 	void add_field13(int8_t field13) { mb_.AddElement<int8_t>(28, field13, 0); }
 	INFOBuilder(megrez::MegrezBuilder &_mb) : mb_(_mb) { start_ = mb_.StartInfo(); }
 	megrez::Offset<INFO> Finish() { return megrez::Offset<INFO>(mb_.EndInfo(start_, 13)); }
@@ -75,6 +80,39 @@ inline megrez::Offset<INFO> CreateINFO(
 	  float field10,
 	  double field11,
 	  megrez::Offset<megrez::String> field12,
+	  int8_t field13) {
+
+	INFOBuilder builder_(_mb);
+	builder_.add_field11(field11);
+	builder_.add_field9(field9);
+	builder_.add_field8(field8);
+	builder_.add_field12(field12);
+	builder_.add_field10(field10);
+	builder_.add_field7(field7);
+	builder_.add_field6(field6);
+	builder_.add_field5(field5);
+	builder_.add_field4(field4);
+	builder_.add_field13(field13);
+	builder_.add_field3(field3);
+	builder_.add_field2(field2);
+	builder_.add_field1(field1);
+	return builder_.Finish();
+}
+
+inline megrez::Offset<INFO> CreateINFO(
+	  megrez::MegrezBuilder &_mb,
+	  uint8_t field1,
+	  int8_t field2,
+	  uint8_t field3,
+	  int16_t field4,
+	  uint16_t field5,
+	  int32_t field6,
+	  uint32_t field7,
+	  int64_t field8,
+	  uint64_t field9,
+	  float field10,
+	  double field11,
+	  std::string field12,
 	  int8_t field13) {
 
 	INFOBuilder builder_(_mb);
