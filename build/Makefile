@@ -123,32 +123,32 @@ MegrezC/fast:
 	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/build
 .PHONY : MegrezC/fast
 
-compiler/MegrezC.obj: compiler/MegrezC.cc.obj
+compiler/compiler.obj: compiler/compiler.cc.obj
 
-.PHONY : compiler/MegrezC.obj
+.PHONY : compiler/compiler.obj
 
 # target to build an object file
-compiler/MegrezC.cc.obj:
-	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj
-.PHONY : compiler/MegrezC.cc.obj
+compiler/compiler.cc.obj:
+	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj
+.PHONY : compiler/compiler.cc.obj
 
-compiler/MegrezC.i: compiler/MegrezC.cc.i
+compiler/compiler.i: compiler/compiler.cc.i
 
-.PHONY : compiler/MegrezC.i
+.PHONY : compiler/compiler.i
 
 # target to preprocess a source file
-compiler/MegrezC.cc.i:
-	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.i
-.PHONY : compiler/MegrezC.cc.i
+compiler/compiler.cc.i:
+	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/compiler.cc.i
+.PHONY : compiler/compiler.cc.i
 
-compiler/MegrezC.s: compiler/MegrezC.cc.s
+compiler/compiler.s: compiler/compiler.cc.s
 
-.PHONY : compiler/MegrezC.s
+.PHONY : compiler/compiler.s
 
 # target to generate assembly for a file
-compiler/MegrezC.cc.s:
-	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.s
-.PHONY : compiler/MegrezC.cc.s
+compiler/compiler.cc.s:
+	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/compiler.cc.s
+.PHONY : compiler/compiler.cc.s
 
 compiler/gen_cpp.obj: compiler/gen_cpp.cc.obj
 
@@ -213,9 +213,9 @@ help:
 	@echo "... MegrezC"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... compiler/MegrezC.obj"
-	@echo "... compiler/MegrezC.i"
-	@echo "... compiler/MegrezC.s"
+	@echo "... compiler/compiler.obj"
+	@echo "... compiler/compiler.i"
+	@echo "... compiler/compiler.s"
 	@echo "... compiler/gen_cpp.obj"
 	@echo "... compiler/gen_cpp.i"
 	@echo "... compiler/gen_cpp.s"

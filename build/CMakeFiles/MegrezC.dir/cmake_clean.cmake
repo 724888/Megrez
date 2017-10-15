@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/MegrezC.dir/compiler/parser.cc.obj"
   "CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj"
-  "CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj"
+  "CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj"
   "MegrezC.pdb"
   "MegrezC.exe"
   "MegrezC.exe.manifest"

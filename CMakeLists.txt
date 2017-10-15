@@ -29,7 +29,7 @@ set(MegrezCompilerSrc
 	compiler/idl.h
 	compiler/parser.cc
 	compiler/gen_cpp.cc
-	compiler/MegrezC.cc
+	compiler/compiler.cc
 )
 
 include_directories(.)

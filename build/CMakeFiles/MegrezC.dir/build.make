@@ -107,43 +107,43 @@ CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj.provides: CMakeFiles/MegrezC.dir/
 CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj.provides.build: CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj
 
 
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj: CMakeFiles/MegrezC.dir/flags.make
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj: CMakeFiles/MegrezC.dir/includes_CXX.rsp
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj: ../compiler/MegrezC.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=D:/Triones/Megrez/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj"
-	C:/MinGW/bin/c++.exe  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj -c D:/Triones/Megrez/compiler/MegrezC.cc
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj: CMakeFiles/MegrezC.dir/flags.make
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj: CMakeFiles/MegrezC.dir/includes_CXX.rsp
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj: ../compiler/compiler.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=D:/Triones/Megrez/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj"
+	C:/MinGW/bin/c++.exe  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj -c D:/Triones/Megrez/compiler/compiler.cc
 
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.i"
-	C:/MinGW/bin/c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E D:/Triones/Megrez/compiler/MegrezC.cc > CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.i
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MegrezC.dir/compiler/compiler.cc.i"
+	C:/MinGW/bin/c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E D:/Triones/Megrez/compiler/compiler.cc > CMakeFiles/MegrezC.dir/compiler/compiler.cc.i
 
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.s"
-	C:/MinGW/bin/c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:/Triones/Megrez/compiler/MegrezC.cc -o CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.s
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MegrezC.dir/compiler/compiler.cc.s"
+	C:/MinGW/bin/c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:/Triones/Megrez/compiler/compiler.cc -o CMakeFiles/MegrezC.dir/compiler/compiler.cc.s
 
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.requires:
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.requires:
 
-.PHONY : CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.requires
+.PHONY : CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.requires
 
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.provides: CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.requires
-	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.provides.build
-.PHONY : CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.provides
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.provides: CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.requires
+	$(MAKE) -f CMakeFiles/MegrezC.dir/build.make CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.provides.build
+.PHONY : CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.provides
 
-CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.provides.build: CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj
+CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.provides.build: CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj
 
 
 # Object files for target MegrezC
 MegrezC_OBJECTS = \
 "CMakeFiles/MegrezC.dir/compiler/parser.cc.obj" \
 "CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj" \
-"CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj"
+"CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj"
 
 # External object files for target MegrezC
 MegrezC_EXTERNAL_OBJECTS =
 
 MegrezC.exe: CMakeFiles/MegrezC.dir/compiler/parser.cc.obj
 MegrezC.exe: CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj
-MegrezC.exe: CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj
+MegrezC.exe: CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj
 MegrezC.exe: CMakeFiles/MegrezC.dir/build.make
 MegrezC.exe: CMakeFiles/MegrezC.dir/linklibs.rsp
 MegrezC.exe: CMakeFiles/MegrezC.dir/objects1.rsp
@@ -159,7 +159,7 @@ CMakeFiles/MegrezC.dir/build: MegrezC.exe
 
 CMakeFiles/MegrezC.dir/requires: CMakeFiles/MegrezC.dir/compiler/parser.cc.obj.requires
 CMakeFiles/MegrezC.dir/requires: CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj.requires
-CMakeFiles/MegrezC.dir/requires: CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj.requires
+CMakeFiles/MegrezC.dir/requires: CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj.requires
 
 .PHONY : CMakeFiles/MegrezC.dir/requires
 

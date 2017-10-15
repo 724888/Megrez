@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "D:/Triones/Megrez/compiler/MegrezC.cc" "D:/Triones/Megrez/build/CMakeFiles/MegrezC.dir/compiler/MegrezC.cc.obj"
+  "D:/Triones/Megrez/compiler/compiler.cc" "D:/Triones/Megrez/build/CMakeFiles/MegrezC.dir/compiler/compiler.cc.obj"
   "D:/Triones/Megrez/compiler/gen_cpp.cc" "D:/Triones/Megrez/build/CMakeFiles/MegrezC.dir/compiler/gen_cpp.cc.obj"
   "D:/Triones/Megrez/compiler/parser.cc" "D:/Triones/Megrez/build/CMakeFiles/MegrezC.dir/compiler/parser.cc.obj"
   )

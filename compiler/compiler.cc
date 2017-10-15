@@ -1,59 +1,57 @@
-/* =====================================================================
-Copyright 2017 The Megrez Authors. All Rights Reserved.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-========================================================================*/
-
-#include "megrez/basic.h"
-#include "megrez/builder.h"
-#include "megrez/info.h"
-#include "megrez/string.h"
-#include "megrez/struct.h"
-#include "megrez/vector.h"
-#include "megrez/util.h"
+#include <cstring>
+#include <iostream>
 #include "compiler/idl.h"
 
-void Error(const char *err, const char *obj = nullptr, bool usage = false);
-
+const char *program_name = NULL;
 struct Generator {
-	bool (*generate)(const megrez::Parser &parser,
-					 const std::string &path,
-					 const std::string &file_name);
-	const char *extension;
+	bool (*generate)(
+	  const megrez::Parser &parser,
+	  const std::string &path,
+	  const std::string &file_name);
+	const char *ext_s;
+	const char *ext_l;
 	const char *name;
 	const char *help;
 };
 
 const Generator generators[] = {
-	{ megrez::GenerateCPP, "c", "C++", "Generate C++ header files;" }
+	{ megrez::GenerateCPP, "c", "cpp", "C++", "     Generate C++ header files;" }
 };
 
-const char *program_name = NULL;
+int get_max_len() {
+	int max_len, len;
+	for(size_t i = 0; i< sizeof(generators)/ sizeof(generators[0]); i++) {
+		len = sizeof(generators[i].ext_l) / sizeof(generators[i].ext_l[0]);
+		if (max_len < len) { max_len = len; }
+	}
+	max_len += 10;
+	return max_len;
+}
+void PrintHelp() {
+	int max_len = get_max_len();
+	for(size_t i = 0; i < sizeof(generators)/ sizeof(generators[0]); i++) {
+		std::cout << "  -" << generators[i].ext_s
+		   << "  --" << generators[i].ext_l;
+		std::cout << generators[i].help << "\n";
+	}
+	std::cout << "\n"
 
+	   << "  -o [PATH]     Prefix PATH to all generated files\n\n"
+
+	   << "FILEs may depend on declarations in earlier files.\n"
+	   << "Output files are named using the base file name of the input,\n"
+	   << "and written to the current directory or the path given by -o.\n"
+	   << "example: MegrezC -c schema1.mgz\n";
+}
+void Error(const char *err, const char *obj = nullptr, bool usage = false);
 void Error(const char *err, const char *obj, bool usage) {
 	printf("%s: %s\n", program_name, err);
 	if (obj) printf(": %s", obj);
 	printf("\n");
 	if (usage) {
-		printf("Usage: %s [OPTION] [FILE]\n", program_name);
-		for (size_t i = 0; i < sizeof(generators) / sizeof(generators[0]); ++i)
-			printf("  -%s      %s.\n", generators[i].extension, generators[i].help);
-		printf("  -o      PATH Prefix PATH to all generated files.\n"
-			   "FILEs may depend on declarations in earlier files.\n"
-			   "Output files are named using the base file name of the input,"
-			   "and written to the current directory or the path given by -o.\n"
-			   "example: %s -c schema1.mgz\n",
-			   program_name);
+		printf("Usage: %s [OPTION]... FILE...\n\n", program_name);
+		PrintHelp();
 	}
 	exit(1);
 }
@@ -73,7 +71,7 @@ int main(int argc, const char *argv[]) {
 	std::vector<std::string> filenames;
 	for (int i = 1; i < argc; i++) {
 		const char *arg = argv[i];
-		if (arg[0] == '-') {
+		if (arg[0] == '-' && arg[1] != '-') {
 			if (filenames.size()) { Error("Invalid option location", arg, true); }
 			if (strlen(arg) != 2) { Error("Invalid commandline argument", arg, true); }
 			switch (arg[1]) {
@@ -82,24 +80,35 @@ int main(int argc, const char *argv[]) {
 					output_path = argv[i];
 					break;
 				default:
-					for (size_t i = 0; i < num_generators; ++i) {
-						if(!strcmp(arg+1, generators[i].extension)) {
+					for (size_t i = 0; i < num_generators; ++i) 
+						if(!strcmp(arg+1, generators[i].ext_s)) {
 							generator_enabled[i] = true;
 							any_generator = true;
 							goto found;
 						}
-					}
 					Error("Unknown commandline argument", arg, true);
 					found:
 					break;
 			}
+
+		} else if (arg[0] == '-' && arg[1] == '-') {
+			std::string arg_ = arg;
+			for (size_t i = 0; i < num_generators; ++i) 
+				if(arg_.substr(2, arg_.length()-2) == generators[i].ext_l) {
+					generator_enabled[i] = true;
+					any_generator = true;
+					
+				} else {
+					Error("Unknown commandline argument", arg, true);
+				}
+
 		} else { filenames.push_back(argv[i]); }
 	}
 
 	if (!filenames.size()) {Error("Missing input files", nullptr, true);}
 	if (!any_generator) { 
 		Error("No options: no output files generated.",
-			  "Specify one of -c.", true); 
+			  "Specify one of -c --cpp etc.", true); 
 	}
 
 	// Now process the files:
@@ -114,15 +123,13 @@ int main(int argc, const char *argv[]) {
 
 			std::string filebase = StripExtension(*file_it);
 
-			for (size_t i = 0; i < num_generators; ++i) {
-				if (generator_enabled[i]) {
+			for (size_t i = 0; i < num_generators; ++i) 
+				if (generator_enabled[i]) 
 					if (!generators[i].generate(parser, output_path, filebase)) {
 						Error((std::string("Unable to generate ") +
 							   generators[i].name + " for " +
 							   filebase).c_str());
 					}
-				}
-			}
 
 			for (auto it = parser.enums_.vec.begin(); it != parser.enums_.vec.end(); ++it)
 				{ (*it)->generated = true; }
