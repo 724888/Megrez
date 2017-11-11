@@ -1,0 +1,3 @@
+D:/Triones/Megrez/build/vs/CMakeFiles/MegrezC.dir
+D:/Triones/Megrez/build/vs/CMakeFiles/ALL_BUILD.dir
+D:/Triones/Megrez/build/vs/CMakeFiles/ZERO_CHECK.dir

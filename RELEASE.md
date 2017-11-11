@@ -1,12 +1,12 @@
 # Release Doc
 
 ## v0.0.6
-> **Time: 2017/10/15**
+> **Time: 2017/11/11**
 
 > **Break Changes**
-**1. Change `root_type` to `Main`.**
-**2. Make the compiler supports `--cpp` command.**
-**3. Allows to direct initialization string without `CreateString()`.**
+1. Change `root_type` to `Main`.
+2. Make the compiler supports `--cpp` command.
+3. Allows to direct initialization string without `CreateString()`.
 
 > **NEXT GOAL**
 1. Rewrite the basic of Megrez.
