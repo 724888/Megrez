@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_RELATIVE_VECTOR_H_
-#define MEGREZ_RELATIVE_VECTOR_H_
+#ifndef MEGREZ_LITE_VECTOR_H_
+#define MEGREZ_LITE_VECTOR_H_
 
 #include "megrez/basic.h"
-#include "megrez/relative/offset.h"
+#include "megrez/lite/offset.h"
 
 namespace megrez {
-namespace Relative {
+namespace Lite {
 
 template<typename T> 
 class Vector {
@@ -100,7 +100,7 @@ class vector_downward {
 	void pop(size_t bytes_to_remove) { cur_ += bytes_to_remove; }
 };
 
-} // namespace Relative
+} // namespace Lite
 } // namespace megrez
 
-#endif // MEGREZ_RELATIVE_VECTOR_H_
+#endif // MEGREZ_LITE_VECTOR_H_

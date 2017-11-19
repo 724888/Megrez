@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_RELATIVE_REINFO_H_
-#define MEGREZ_RELATIVE_REINFO_H_
+#ifndef MEGREZ_LITE_LITEINFO_H_
+#define MEGREZ_LITE_LITEINFO_H_
 
 #include "megrez/basic.h"
-#include "megrez/relative/offset.h"
+#include "megrez/lite/offset.h"
 
 namespace megrez {
-namespace Relative {
+namespace Lite {
 
 class Info {
  private:
@@ -69,7 +69,7 @@ class Info {
 	}
 };
 
-} // namespace Relative
+} // namespace Lite
 } // namespace megrez
 
-#endif // MEGREZ_RELATIVE_REINFO_H_
+#endif // MEGREZ_LITE_LITEINFO_H_

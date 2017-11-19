@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_RELATIVE_BUILDER_H_
-#define MEGREZ_RELATIVE_BUILDER_H_
+#ifndef MEGREZ_LITE_BUILDER_H_
+#define MEGREZ_LITE_BUILDER_H_
 
-#include "megrez/relative/vector.h"
-#include "megrez/relative/string.h"
+#include "megrez/lite/vector.h"
+#include "megrez/lite/string.h"
 #include "megrez/basic.h"
 #include "megrez/util.h"
-#include "megrez/relative/offset.h"
+#include "megrez/lite/offset.h"
 
 namespace megrez {
-namespace Relative {
+namespace Lite {
 
 class MegrezBuilder {
  private:
@@ -241,7 +241,7 @@ class MegrezBuilder {
 	}
 };
 
-} // namespace Relative
+} // namespace Lite
 } // namespace megrez
 
-#endif // MEGREZ_RELATIVE_BUILDER_H_
+#endif // MEGREZ_LITE_BUILDER_H_

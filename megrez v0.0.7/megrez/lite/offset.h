@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_RELATIVE_OFFSET_H_
-#define MEGREZ_RELATIVE_OFFSET_H_
+#ifndef MEGREZ_LITE_OFFSET_H_
+#define MEGREZ_LITE_OFFSET_H_
 
 #include "megrez/basic.h"
-#include "megrez/relative/offset.h"
+#include "megrez/lite/offset.h"
 
 namespace megrez {
-namespace Relative {
+namespace Lite {
 
 typedef int8 ofs_t;
 typedef uint8 uofs_t;
@@ -68,7 +68,7 @@ class IndirectHelper<const T *> {
 	}
 };
 
-} // namespace Relative
+} // namespace Lite
 } // namespace megrez
 
-#endif // MEGREZ_RELATIVE_OFFSET_H_
+#endif // MEGREZ_LITE_OFFSET_H_

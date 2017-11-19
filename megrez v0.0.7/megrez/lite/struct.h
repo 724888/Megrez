@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_RELATIVE_STRUCT_H_
-#define MEGREZ_RELATIVE_STRUCT_H_
+#ifndef MEGREZ_Lite_STRUCT_H_
+#define MEGREZ_Lite_STRUCT_H_
 
 #include "megrez/basic.h"
-#include "megrez/relative/offset.h"
+#include "megrez/lite/offset.h"
 
 namespace megrez {
-namespace Relative {
+namespace Lite {
 	
 class Struct {
  private:
@@ -40,7 +40,7 @@ class Struct {
 
 };
 
-} // namespace Relative
+} // namespace Lite
 } // namespace megrez
 
-#endif // MEGREZ_RELATIVE_STRUCT_H_
+#endif // MEGREZ_Lite_STRUCT_H_

@@ -14,21 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ========================================================================*/
 
-#ifndef MEGREZ_RELATIVE_STRING_H_
-#define MEGREZ_RELATIVE_STRING_H_
+#ifndef MEGREZ_Lite_STRING_H_
+#define MEGREZ_Lite_STRING_H_
 
-#include "megrez/relative/vector.h"
-#include "megrez/relative/offset.h"
+#include "megrez/lite/vector.h"
+#include "megrez/lite/offset.h"
 
 namespace megrez {
-namespace Relative {
+namespace Lite {
 	
 struct String : public Vector<char> {
 	const char *c_str() const { return reinterpret_cast<const char *>(Data()); }
 	const char *ToCStr() const { return reinterpret_cast<const char *>(Data()); }
 };
 
-} // namespace Relative
+} // namespace Lite
 } // namespace megrez
 
-#endif // MEGREZ_RELATIVE_STRING_H_
+#endif // MEGREZ_Lite_STRING_H_
