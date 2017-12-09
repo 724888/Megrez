@@ -1,3 +1,0 @@
-D:/etc/megrez/testbuild/CMakeFiles/rebuild_cache.dir
-D:/etc/megrez/testbuild/CMakeFiles/format_unittest.dir
-D:/etc/megrez/testbuild/CMakeFiles/edit_cache.dir
