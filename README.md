@@ -18,3 +18,7 @@ Megrez is a fast data serialization tool for memory constrained applications.
 3. Use `MegrezC.exe` to compile the IDL file into different languages.
 4. Add `./megrez` into your compiler (Megrez requires a C++11 compatible compiler).
 5. For C++, you can `#include "schema.mgz.h"` (just a example) to continue.
+
+## To join the development?
+
+You can make a new pull request, PR is welcomed!
