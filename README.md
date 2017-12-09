@@ -21,4 +21,4 @@ Megrez is a fast data serialization tool for memory constrained applications.
 
 ## To join the development?
 
-You can make a new pull request, PR is welcomed!
+You can make a new pull request, Pull Request is welcomed!
