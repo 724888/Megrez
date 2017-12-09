@@ -1,3 +1,0 @@
-D:/Triones/Megrez/build/UnixMakefiles/CMakeFiles/MegrezC.dir
-D:/Triones/Megrez/build/UnixMakefiles/CMakeFiles/edit_cache.dir
-D:/Triones/Megrez/build/UnixMakefiles/CMakeFiles/rebuild_cache.dir

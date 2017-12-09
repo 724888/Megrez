@@ -1,0 +1,3 @@
+D:/Triones/Megrez/megrez v0.0.7/test/testbuild/CMakeFiles/stream_unittest.dir
+D:/Triones/Megrez/megrez v0.0.7/test/testbuild/CMakeFiles/edit_cache.dir
+D:/Triones/Megrez/megrez v0.0.7/test/testbuild/CMakeFiles/rebuild_cache.dir
